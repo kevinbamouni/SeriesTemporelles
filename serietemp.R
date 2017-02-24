@@ -64,11 +64,23 @@ acf(gazolezoo)
 
 pacf(gazolezoo)
 
-acf(diff(gazolezoo))
+acf(diff(gazolezoo,lag=1,differences =2 ))
+acf(diff(gazolezoo ))
 
 pacf(diff(gazolezoo))
 
+acf(gazolezoo[,1]-stl(gazolezoo,s.window = "p")$time.series[,2]-stl(gazolezoo,s.window = "p")$time.series[,3])
 
+acf(diff(gazolezoo[,1]-stl(gazolezoo,s.window = "p")$time.series[,2]))
 
+# moyenne mobile pour estimation de la tendance 
 
+trendma =stats::filter(gazolezoo,rep(1/12,12),method="convolution", circular=F) # contient la tendance par moyenne mobile
+plot(trendma)
 
+# on viz la serie sans tendance
+plot(gazolezoo-trendma)
+#
+acf(na.omit(gazolezoo-trendma))
+
+plot(diff(gazolezoo))

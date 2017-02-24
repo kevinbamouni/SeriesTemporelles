@@ -3,6 +3,8 @@ title: "SERIES TEMPORELLES"
 output: html_notebook
 ---
 
+
+
 ```{r import_format_data, include=FALSE}
 ######    Proposer une methode de prediction de vente de 16 et 17 pour les 12 prochains mois
 # 16 Vente de super carburant en kt au ---> super
@@ -32,6 +34,10 @@ gazolezoo = zoo(gazole,as.yearmon(dates))
 names(gazole)="Ventes de gazole (en kt)"
 ```
 
+# Introduction et hypothèses
+
+On suppose que les processus sont additifs
+
 # Visualisation des données des séries temporelles
 
 ## Ventes de gazole (en kt)
@@ -49,24 +55,106 @@ dygraph((superzoo), main = "Ventes de supercarburants auto (en kt)",
         ylab = "supercarburants auto (en kt)")
 ```
 
-# Test de stationnarité
+# Test de stationnarité :  
+
+## Gazole : le test de Dickey-Fuller augmenté
+ 
+ 
+```{r}
+# Augmented Dickey-Fuller Test du package "tseries"
+
+# adf.test(diff(log(gazolezoo)), alternative="stationary", k=0)
+adf.test(gazolezoo)
+
+```
+
+On ne rejette pas l'hypothèse nulle, elle est non stationnaire
+
+## Phillips-Perron Unit Root Test
+
+```{r}
+pp.test(gazolezoo)
+```
+La serie ne possède pas de racine unitaire unique.
+
+## Gazole : le test KPSS
+
+```{r}
+# Test KPSS de stationnarité du package spss
+
+kpss.test(gazolezoo)
+
+```
+On rejette l'hypothèse nulle de stationnarité, la série est donc non stationnaire
+
+## Super : le test de Dickey-Fuller augmenté
+
+```{r}
+# Augmented Dickey-Fuller Test du package "tseries"
+
+# adf.test(diff(log(superzoo)), alternative="stationary", k=0)
+adf.test((superzoo))
+
+
+```
+
+## Phillips-Perron Unit Root Test
+
+```{r}
+pp.test(superzoo)
+```
+
+
+## Super : le test KPSSles tests de Phillips-Perron
+
+```{r}
+# Test KPSS de stationnarité du package spss
+
+kpss.test(superzoo)
+```
+
+# Autocorrelogrammes et autocorrelogrammes partielles : Confirmation de non-stationnaritée
+
+## Vente de gazole en kt
+
+```{r}
+acf(gazolezoo)
+```
+
+
+## Vente de super carburant en kt
+
+```{r}
+acf(superzoo)
+```
+ Les séries n'ont pas des autocorellogrammes qui décroissent de manière exponnentielle vers 0. Elle ne sont pas stationnaires
+Nous allond devoir les stationnariser. Nous pouvons essayer de les stationnariser par différentiation ou par elimination du trend déterministe. la qualité des autocorrelogrammes déterminera la méthode de stationnarisation à retenir.
+
+# Stationnarisation
 
 ## Gazole
- 
- 
-```{r}
-# Augmented Dickey-Fuller Test du package "tseries"
-
-adf.test(diff(log(gazolezoo)), alternative="stationary", k=0)
-```
-
-## Super
 
 ```{r}
-# Augmented Dickey-Fuller Test du package "tseries"
+# Différentiation
+dygraph(diff(log(gazolezoo)))
 
-adf.test(diff(log(superzoo)), alternative="stationary", k=0)
+# Autocorellogramme
+acf(diff(log(gazolezoo)))
+
+# Suppression du trend
+ # contient la tendance déterministe obtenue par moyenne mobile
+plot(stats::filter(gazolezoo,rep(1/12,12),method="convolution", circular=F))
+
+# Série obtenur après elimination de tendance deterministe par moyenne mobile
+dygraph(gazolezoo-stats::filter(gazolezoo,rep(1/12,12),method="convolution", circular=F))
+
+# Autocorrelogramme de la serie obtenue par élimination de la tendance
+acf(na.omit(gazolezoo-stats::filter(gazolezoo,rep(1/12,12),method="convolution", circular=F)))
 ```
+On va préférer la stationnarisation par différentiation autocorrelogramme est plus "propre"
+
+
+## stationnarisation Super
 
 # Décomposition des séries temporelle :  Saisonalité, tendance et bruits.
 
@@ -89,8 +177,9 @@ dfgazolezoo[,"x"]= dates # Insersion d'indice
 # Creates a four-facet plot of seasonal decomposition showing observed, trend, seasonal and random components
 # frequency	= frequency of the period of the time series eg 12 = monthly
 
-ggsdc(dfgazolezoo, aes(x = x, y = gazolezoo), method = "decompose", frequency = frequency(gazolezoo),
-      facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "", "Période de la série","Résidus aléatoires")) + geom_line()
+p = ggsdc(dfgazolezoo, aes(x = x, y = gazolezoo), method = "decompose", frequency = frequency(gazolezoo),
+      facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires")) + geom_line()
+p
 ```
 
 Décomposition par ajustement de la saisonnalité avec "seas" (de x-13arima-seats)
@@ -143,25 +232,9 @@ ggsdc(dfsuperzoo, aes(x = x, y = superzoo), method = "decompose", frequency = fr
       facet.titles = c("Série temporelle de Vente de super carburant en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires"), start = 1981) + geom_line()
 ```
 
-# Autocorrelogrammes et autocorrelogrammes partielles
 
-## Vente de gazole en kt
 
-```{r}
-acf(gazolezoo)
-```
 
-```{r}
-pacf(gazolezoo)
-```
 
-## Vente de super carburant en kt
-
-```{r}
-acf(superzoo)
-```
-
-```{r}
-pacf(superzoo)
-```
+# Modélisation Arima
 
