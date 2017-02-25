@@ -1,6 +1,15 @@
 ---
 title: "SERIES TEMPORELLES"
-output: html_notebook
+output:
+  pdf_document:
+    toc: yes
+  html_notebook:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 8
+    toc: yes
+  html_document:
+    toc: yes
 ---
 
 
@@ -127,6 +136,8 @@ acf(gazolezoo)
 ```{r}
 acf(superzoo)
 ```
+ 
+ 
  Les séries n'ont pas des autocorellogrammes qui décroissent de manière exponnentielle vers 0. Elle ne sont pas stationnaires
 Nous allond devoir les stationnariser. Nous pouvons essayer de les stationnariser par différentiation ou par elimination du trend déterministe. la qualité des autocorrelogrammes déterminera la méthode de stationnarisation à retenir.
 
@@ -167,17 +178,20 @@ Décomposition par moyennes mobiles
 library(ggplot2)
 library(ggseas)
 
+# Stationnarisation par differentiation
+dfgazolezoo = diff(gazolezoo)
+
 # Pour Utilisation de ggplot faut que l'élément soit forcément en dataframe
 # Donc on transforme les objets zoo en dataframe pour utiliser ggplot2
 # On stocke kle dataframe dans une nouvelle variable
 
-dfgazolezoo = as.data.frame(gazolezoo, row.names = c(1:length(gazolezoo))) # Conversion en dataframe
-dfgazolezoo[,"x"]= dates # Insersion d'indice
+dfgazolezoo = as.data.frame(dfgazolezoo, row.names = c(1:length(dfgazolezoo))) # Conversion en dataframe
+dfgazolezoo[,"x"]= seq(as.Date("1981/2/1"), as.Date("2016/11/1"),by = "month") # Insersion d'indice
 
 # Creates a four-facet plot of seasonal decomposition showing observed, trend, seasonal and random components
 # frequency	= frequency of the period of the time series eg 12 = monthly
 
-p = ggsdc(dfgazolezoo, aes(x = x, y = gazolezoo), method = "decompose", frequency = frequency(gazolezoo),
+p = ggsdc(dfgazolezoo, aes(x = x, y = dfgazolezoo), method = "decompose", frequency = frequency(zoo(dfgazolezoo["dfgazolezoo"],as.yearmon(dfgazolezoo[,"x"]))),
       facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires")) + geom_line()
 p
 ```
@@ -190,13 +204,13 @@ Décomposition par ajustement de la saisonnalité avec "seas" (de x-13arima-seat
 # Donc on transforme les objets zoo en dataframe pour utiliser ggplot2
 # On stocke kle dataframe dans une nouvelle variable
 
-dfgazolezoo = as.data.frame(gazolezoo, row.names = c(1:length(gazolezoo))) # Conversion en dataframe
-dfgazolezoo[,"x"]= dates # Insersion d'indice
+# dfgazolezoo = as.data.frame(gazolezoo, row.names = c(1:length(gazolezoo))) # Conversion en dataframe
+# dfgazolezoo[,"x"]= dates # Insersion d'indice
 
 # Creates a four-facet plot of seasonal decomposition showing observed, trend, seasonal and random components
 # frequency	= frequency of the period of the time series eg 12 = monthly
 
-ggsdc(dfgazolezoo, aes(x = x, y = gazolezoo), method = "seas", frequency = frequency(gazolezoo),
+ggsdc(dfgazolezoo, aes(x = x, y = dfgazolezoo), method = "seas", frequency = frequency(zoo(dfgazolezoo["dfgazolezoo"],as.yearmon(dfgazolezoo[,"x"]))),
       facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires"), start = 1981) + geom_line()
 
 ```
@@ -208,7 +222,7 @@ Décomposition par Loess
 
 # Decomposition par la methode stl, jugée meilleure , d'après la documentation de r.
 # s.window est un paramètre de la fonction method = "stl"
-ggsdc(dfgazolezoo, aes(x = x, y = gazolezoo), method = "stl", frequency = frequency(gazolezoo), s.window = "periodic", facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires")) + geom_line()
+ggsdc(dfgazolezoo, aes(x = x, y = dfgazolezoo), method = "stl", frequency = frequency(zoo(dfgazolezoo["dfgazolezoo"],as.yearmon(dfgazolezoo[,"x"]))), s.window = "periodic", facet.titles = c("Série temporelle de Vente de gazole en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires")) + geom_line()
 
 ```
 
@@ -218,17 +232,20 @@ Décomposition par ajustement de la saisonnalité avec "seas" (de x-13arima-seat
 
 ```{r}
 
+# Stationnarisation par differentiation
+dfsuperzoo = diff(superzoo)
+
 # Pour Utilisation de ggplot faut que l'élément soit forcément en dataframe
 # Donc on transforme les objets zoo en dataframe pour utiliser ggplot2
 # On stocke kle dataframe dans une nouvelle variable
 
-dfsuperzoo = as.data.frame(superzoo, row.names = c(1:length(superzoo))) # Conversion en dataframe
-dfsuperzoo[,"x"]= dates # Insersion d'indice
+dfsuperzoo = as.data.frame(dfsuperzoo, row.names = c(1:length(dfsuperzoo))) # Conversion en dataframe
+dfsuperzoo[,"x"]= seq(as.Date("1981/2/1"), as.Date("2016/11/1"),by = "month") #  # Insersion d'indice
 
 # Creates a four-facet plot of seasonal decomposition showing observed, trend, seasonal and random components
 # frequency	= frequency of the period of the time series eg 12 = monthly
 
-ggsdc(dfsuperzoo, aes(x = x, y = superzoo), method = "decompose", frequency = frequency(superzoo),
+ggsdc(dfsuperzoo, aes(x = x, y = dfsuperzoo), method = "decompose", frequency = frequency(zoo(dfsuperzoo["dfsuperzoo"],as.yearmon(dfsuperzoo[,"x"]))),
       facet.titles = c("Série temporelle de Vente de super carburant en kt", "Le trend de la série", "Saisonnalité de la série","Résidus aléatoires"), start = 1981) + geom_line()
 ```
 
