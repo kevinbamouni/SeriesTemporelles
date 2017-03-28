@@ -37,7 +37,7 @@ On suppose que les processus sont additifs
 ## Ventes de gazole (en kt)
 
 ```{r}
-plot.ts(gazolezoo)
+plot.ts(gazolezoo, main="Vente de gazoil")
 ```
 
 
@@ -99,13 +99,52 @@ pacf(gazolezoo)
 ```{r}
 gazolezoo_additive = decompose(as.ts(gazolezoo))
 
-plot(gazolezoo_additive)
+plot(gazolezoo_additive, main="Décomposition additive de la serie intiale")
 
 ```
 
 ```{r}
 gazolezoo_multiplicative = decompose(as.ts(gazolezoo),type = "multiplicative")
 
-plot(gazolezoo_multiplicative)
+plot(gazolezoo_multiplicative, main="Décomposition multiplicative de la série initiale")
 ```
+# Stationnarisation de la série
+
+L'élimination du trend donne une meilleure décomposition que l'élimination du trend et la saisonnalité.
+```{r}
+plot.ts(diff(gazolezoo), main = "Différentiation de la série pour éliminer le trend")
+plot(decompose(as.ts(diff(gazolezoo)),type = "multiplicative"))
+
+plot.ts(diff(diff(gazolezoo),differences=12),main = "Différentiation de la série pour éliminer le trend et la saisonnalité")
+plot(decompose(as.ts(diff(diff(gazolezoo),differences=12)),type = "multiplicative"))
+
+```
+
+
+# ACF et PACF de la série initiale différentiée et privée de son trend (et saisonnalité) ...
+
+```{r}
+gazolezoo_diff=diff(gazolezoo)
+
+acf(diff(diff(gazolezoo),differences=12), lag=60)
+pacf(diff(diff(gazolezoo),differences=12), lag=60)
+```
+
+
+# ARIMA
+
+```{r}
+mod=sarima(diff((gazolezoo)), 2, 1, 1, P = 1, D = 1, Q = 6, S = 6)
+# Aic<-(-2*mod$loglik)+2*8
+# Aic
+# Bic<-(-2*mod$loglik)+8*log(length(gazolezoo))
+# Bic
+# aic<-log(mod$sigma2)+2*6/length(gazolezoo)
+# aic
+# bic<-log(mod$sigma2)+6/length(gazolezoo)*log(length(gazolezoo))
+# bic
+tsdiag(mod, gof.lag=60)
+```
+
+
 
