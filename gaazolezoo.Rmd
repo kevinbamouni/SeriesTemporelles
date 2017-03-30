@@ -134,16 +134,45 @@ pacf(gazoletsdiff)
 # ARIMA
 
 ```{r}
-out<-arima(gazoletsdiff_decmult$x,order=c(6,0,8))
+out<-arima(gazoletsdiff_decmult$x,order=c(4,1,4),seasonal=list(order=c(4,1,4),period=12), method = "ML")
 tsdiag(out, gof.lag=60)
 ```
 
-# modélisation directe de la série...sans élimination
+# modélisation directe de la série...sans élimination ni de tendance ni de saisonnalité
 
 ```{r}
-out2<-arima(gazolets,order=c(4,2,4),seasonal=list(order=c(4,2,4),period=12))
+out2<-arima(gazolets,order=c(4,2,4),seasonal=list(order=c(4,2,4),period=12), method = "ML")
 tsdiag(out2, gof.lag=60)
 
 ```
 
+# Tendance éliminée
 
+```{r}
+gazoletsdiff1 = diff(gazolets)
+
+plot(gazoletsdiff1)
+
+```
+
+# ACF ET PACF série sans trend
+
+```{r}
+acf(gazoletsdiff1)
+
+pacf(gazoletsdiff1)
+```
+
+# modélisation arima avec saisonnalité...
+
+```{r}
+out3<-arima(gazolets,order=c(4,2,4),seasonal=list(order=c(4,2,4),period=NA),method="ML")
+#out3 = sarima(gazolets, 4, 2, 4, P = 4, D = 2, Q = 4, S = 12)
+tsdiag(out3, gof.lag=60)
+```
+
+```{r}
+out4<-arima(gazolets,order=c(4,1,8),seasonal=list(order=c(4,1,8),period=NA),method="ML")
+#out3 = sarima(gazolets, 4, 2, 4, P = 4, D = 2, Q = 4, S = 12)
+tsdiag(out4, gof.lag=60)
+```
