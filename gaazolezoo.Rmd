@@ -16,6 +16,7 @@ library(ggplot2)
 library(zoo)
 library(plotly)
 library(tseries)
+library(forecast)
 
 # les dates d'indexation des series temporelles, données mensuelles
 dates = seq(as.Date("1981/1/1"), as.Date("2016/11/1"),by = "month")
@@ -134,7 +135,12 @@ pacf(gazoletsdiff)
 # ARIMA
 
 ```{r}
-out<-arima(gazoletsdiff_decmult$x,order=c(4,1,4),seasonal=list(order=c(4,1,4),period=12), method = "ML")
+tsdisplay(diff(diff(gazolets,12),12))
+```
+
+```{r}
+
+out<-arima(gazolets,order=c(5,0,3),seasonal=list(order=c(2,2,5)), method = "ML")
 tsdiag(out, gof.lag=60)
 ```
 
