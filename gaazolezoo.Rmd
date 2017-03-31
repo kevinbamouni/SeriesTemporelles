@@ -9,7 +9,7 @@ output:
 
 
 
-```{r import_format_data, include=FALSE}
+```{r import_format_data, message=FALSE, warning=FALSE, include=FALSE}
 ######    Proposer une methode de prediction de vente de 16 et 17 pour les 12 prochains mois
 # 16 Vente de super carburant en kt au ---> super
 # 17 Vente de gazole en kt ---> gazole
@@ -126,6 +126,9 @@ La section précédente nous a permis de conclure sur une série non-stationnaire, 
 
 La première étape essentielle est la stationnarisation de la série. IL existe plusieurs manières de le faire, mais le plus important est de choisir une série stationnaire qui permettrait de choisir les bons coefficients. Nous choisissons une stationnarisation par différentiation de degré 2 au lag 12, pour supprimer la tendance et la saisonnalité.
 
+$$d^2X = dX_t-dX_{t-12}\  \ avec\  \ dX = X_t-X_{t-12}$$
+
+
 ```{r}
 tsdisplay(diff(diff(gazolets,12),12))
 ```
@@ -138,22 +141,91 @@ L'autocorrelograme de la série décroit de façon exponnentielle, avec un pique au
 adf.test(diff(diff(gazolets,12),12))
 
 ```
-```
+
 Avec la confirmation du test de Dickey-Fuller augmenté (p-value inférieure à 5%) on obtient une série stationnaire.
 
 ## Choix des paramètres p,d,q et P,D,Q
 
 Le choix des paramètres (p,d,q)(P,D,Q), se font essentiellement sur la base de l'autocorrelogramme et de l'autocorrelogramme partiel. 
 
+### Choix des paramètres p,d,q
+
+Pour choisir les paramètres p,d,q qui représentent la modélisation de la partie non saisonnière, on observe l'ACF (autocorrélogramme) et le PACF (autocorrélogramme partiel) à partir du lag 1. L'appréciation de l'ACF permet le choix de q. On choisit q de sorte à pouvoir tenir compte des autocorrélations succéssives qui sortent de la zone d'acceptation (les lignes discontinuent bleues sur la figure).  
+Par observation de l'ACF (ci-dessous), les trois premières autocorrélations sont très significatives, surtout la troisième, donc un canditat est $q=3$ .
+
 ```{r}
 ggAcf(diff(diff(gazolets,12),12))
+```
+
+Quant à p, il est choisi sur le même principe que le q mais appliqué au PACF. On observe les premières autocorrélations partielles, c'est à dire à partir de 1, et on prend le coefficient qui tient compte des piques qui sont hors de la zone d'acceptation (autocorrélation partielle est nulle pour le lag correspondant) .
+Des quandidats possibles à p sont $p=3$ , $p=5$ .
+
+```{r}
 ggPacf(diff(diff(gazolets,12),12))
 ```
 
+Le paramètre d représente le dégré de différentiation de la partie non saisonnière, vu que la série n'a été différentiée deux fois au lag 12, c'est à dire que sur la période, on suppose que la partie non saisonnière n'a pas été différentiée
+
+### Choix des paramètres P,D,Q
+
+Les paramètres P,Q se choisissent sur les mêmes critères que p,d,q mais appliqués à la partie saisonnière. Pour le choix de ces paramètres, on observe l'ACF et le PACF mais à partir du lag de la période, c'est à dire 12. Donc les parmètres seront choisi afin de tenir compte des piques significatifs à partir du lag 12, contrairement à la partie non saisonnière qui commence au lag 1. Donc $d=0$ .
+Le paramètre D représente le dégré de différentiation de la partie saisonnière c'est à dire $D=2$.
+
+### Conclusion
+
+Les modèles candidats sont donc $SARIMA(3,0,3)(2,2,3)_{12}$ et $SARIMA(5,0,3)(2,2,3)_{12}$ .
+
+## Modélisation de la série
+
+la modésation de la série consiste à appliquer les remarques faites sur ses caractéristiques, et estimations des coefficients de la série par la méthode de maximum de vraissemblance. 
+
+### SARIMA(3,0,3)(2,2,3)  
+
+Le premier modèle appliqué est le modèle : $SARIMA(3,0,3)(2,2,3)_{12}$ .
 
 ```{r}
-out<-arima(gazolets,order=c(5,0,3),seasonal=list(order=c(2,2,5)), method = "ML")
+out<-arima(gazolets,order=c(3,0,3),seasonal=list(order=c(2,2,5)), method = "ML")
 tsdiag(out, gof.lag=60)
 ```
 
+L'exécution de ce modèle sous R renvoie le message, "problème de convergence possible : optim renvoie un code = 1", et fourni des résultats assez mauvais. Donc il est exclu de nos modèles.
+
+### SARIMA(5,0,3)(2,2,3) 
+
+Le deuxième modèle appliqué est le modèle : $SARIMA(5,0,3)(2,2,3)_{12}$ .
+
+```{r}
+out<-(arima(gazolets,order=c(5,0,3),seasonal=list(order=c(2,2,5)), method = "ML"))
+tsdiag(out, gof.lag=60)
+```
+
+La figure ci-dessus représente les residus, l'ACF des résidus et le test Ljung-Box static, qui fourni l'hypothèse de non autocorrélation des résidus jusqu'au lag 60.
+
+
+```{r, echo=FALSE}
+qqnorm(out$residuals)
+qqline(out$residuals)
+```
+
+Avec le test de normalité ci dessus, nous pouvons supposer que les résidus suivent une loi normale, doc qu'on a bien un bruit blanc. Mais nous restons conscient que cette hypothèse est très limite et qu'il y'aurait moyen de fair mieux en choisisant un meilleur modèle. Cependant il faudrait éviter les modèles avec un très grand nombre de paramètre à estimer sysnonyme d'erreurs d'estimation. 
+
+Les sorties du modèle de la série sont donc : 
+
+```{r, echo=FALSE}
+out
+```
+
+# Prédiction
+
+A partir du modèle estimé, nous pouvons faire une prédiction sur les 12 mois suivant de la série.
+
+```{r}
+predict(out, n.ahead = 12)
+```
+
+pred : la prédiction, se : l'erreur d'estimation.
+
+```{r}
+plot(predict(out, n.ahead = 12))
+```
 
