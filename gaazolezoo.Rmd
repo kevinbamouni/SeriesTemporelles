@@ -37,7 +37,7 @@ names(gazole)="Ventes de gazole (en kt)"
 
 # Données : Ventes de gazole (en kt)
 
-La série chronologique étudiée représente les ventes mensuelles de gazole (en kt) du 01 janvier 1981 au 01 novembre 2016. 
+La série chronologique étudiée représente les ventes mensuelles de gazole (en Kt) du 01 janvier 1981 au 01 novembre 2016. 
 
 ```{r}
 plot.ts(gazolets, main="Ventes de gazole en kt")
@@ -47,12 +47,12 @@ La figure ci-dessus représente la série. Les premières observations que nous 
 - La série a une tendance croissante.
 - La série a une périodicité, du fait de sa succession de croissance et de décroissante au fil du temps.
 - La série est multiplicative, du fait que l'amplitude de sa période augmente avec le temps.
-- On peut utiliser le log de la série pour supprimmer cette variation d'amplitude dans la série.
+- On peut utiliser le log de la série pour supprimer cette variation d'amplitude dans la série.
 - La série n'est pas stationnaire, la variance n'est pas constante dans le temps.
 
 # Caractéristiques de la série.
 
-Certaines remarques ont été faite à la première observation de la série, cependant il conviendrait de vérifier ces appréhension et de poser certaines hypothèses si nécéssaire de sorte à pouvoir cerner toutes les caractéristiques de la série.
+Certaines remarques ont été faite à la première observation de la série, cependant il conviendrait de vérifier ces appréhensions et de poser certaines hypothèses si nécéssaires de sorte à pouvoir cerner toutes les caractéristiques de la série.
 
 Nous passons au log des données afin de pouvoir réduire les variations d'amplitude dans le temps.
 
@@ -62,7 +62,7 @@ plot.ts(log(gazolets), main="log des Ventes de gazole en kt")
 # loggazolets = log(gazolets) # pour supprimmer la diffÃ©rence d'amplitude
 ```
 
-En observant le log de la série, la variation d'amplitude n'ont pas totalement disparu, de plus la tendance présente désormais une certaine courbure. En passans au log, le problème d'amplitude n'a pas été résolu de façon satisfaisante, pour la tendance, plus elle est linéaire, mieux nous pouvons l'observer de façon globale.
+En observant le log de la série, la variation d'amplitude n'ont pas totalement disparu, de plus la tendance présente désormais une certaine courbure. En passant au log, le problème d'amplitude n'a pas été résolu de façon satisfaisante, pour la tendance, plus elle est linéaire, mieux nous pouvons l'observer de façon globale.
 
 ## Test de stationnarité de la série.  
 
@@ -77,15 +77,15 @@ adf.test(gazolets)
 
 On ne rejette pas l'hypothèse nulle la p-value étant supérieur au seuil de 5%, la série est donc non stationnaire.
 
-Cette hypothèse peut etre confirmée par l'observation de l'autocorrelogramme de la série.
+Cette hypothèse peut être confirmée par l'observation de l'autocorrelogramme de la série.
 
 
 ```{r}
 ggAcf(gazolets, main="Vente de gazole en kt")
 ```
 
-L'autocorrellogramme ne décroit pas de façon exponentielle vers 0, par contre on observe des grands piques aux lags 1, 12, 24. ce qui pourrait représenter la périodicité de la série.
-La période la série peut être confirmée par la fonction frequency de R.
+L'autocorrellogramme ne décroît pas de façon exponentielle vers 0, par contre on observe des grands piques aux lags 1, 12, 24. ce qui pourrait représenter la périodicité de la série.
+La période la série peut-être confirmée par la fonction frequency de R.
 ```{r}
 frequency(gazolets)
 ```
@@ -108,12 +108,12 @@ En résumé, les caractéristiques de la série sont les suivantes :
 
 - Non stationnaire
 - additive
-- tendance croisante
+- tendance croissante
 - périodique de période 12
 
 # Modélisation de la série
 
-La section précédente nous a permis de conclure sur une série non-stationnaire, saisonnière de saisonnalité 12. Le choix logique de modèle pour l'estimation de la série est un modèle Seasonnal ARIMA (p,d,q)(P,D,Q) (SARIMA). Les coefficients de ce modèles sont eux aussi fournis par les caractéristiques de la série. Le choix de ces coefficients représentent la principale difficulté, cependant nous pouvons observer différentes transformations de la série afin d'orienter nos différents choix. Tout d'abord explicitons les différentes significations de ces coefficients :
+La section précédente nous a permis de conclure sur une série non-stationnaire, saisonnière de saisonnalité 12. Le choix logique de ce modèle pour l'estimation de la série est un modèle Seasonnal ARIMA (p,d,q)(P,D,Q) (SARIMA). Les coefficients de ce modèles sont eux aussi fournis par les caractéristiques de la série. Le choix de ces coefficients représentent la principale difficulté, cependant nous pouvons observer différentes transformations de la série afin d'orienter nos différents choix. Tout d'abord explicitons les différentes significations de ces coefficients :
 
 - p : AR de la partie non saisonnière de la série
 - d : Degré d'intégration de la partie non saisonnière de la série
@@ -124,7 +124,7 @@ La section précédente nous a permis de conclure sur une série non-stationnair
 
 ## Stationnarisation de la série
 
-La première étape essentielle est la stationnarisation de la série. IL existe plusieurs manières de le faire, mais le plus important est de choisir une série stationnaire qui permettrait de choisir les bons coefficients. Nous choisissons une stationnarisation par différentiation de degré 2 au lag 12, pour supprimer la tendance et la saisonnalité.
+La première étape essentielle est la stationnarisation de la série. IL existe plusieurs manières de le faire, mais le plus important est de choisir une série stationnaire qui permettrait de choisir les bons coefficients. Nous choisissons une stationnarisation par différenciation de degré 2 au lag 12, pour supprimer la tendance et la saisonnalité.
 
 $$d^2X = dX_t-dX_{t-12}\  \ avec\  \ dX = X_t-X_{t-12}$$
 
@@ -133,7 +133,7 @@ $$d^2X = dX_t-dX_{t-12}\  \ avec\  \ dX = X_t-X_{t-12}$$
 tsdisplay(diff(diff(gazolets,12),12))
 ```
 
-L'autocorrelograme de la série décroit de façon exponnentielle, avec un pique au lag 12 qui représente la saisonnalité aussi observé dans l'autocorrelogramme partiel.
+L'autocorrelograme de la série décroît de façon exponnentielle, avec un pique au lag 12 qui représente la saisonnalité aussi observé dans l'autocorrelogramme partiel.
 
 
 ```{r}
@@ -150,26 +150,26 @@ Le choix des paramètres (p,d,q)(P,D,Q), se font essentiellement sur la base de 
 
 ### Choix des paramètres p,d,q
 
-Pour choisir les paramètres p,d,q qui représentent la modélisation de la partie non saisonnière, on observe l'ACF (autocorrélogramme) et le PACF (autocorrélogramme partiel) à partir du lag 1. L'appréciation de l'ACF permet le choix de q. On choisit q de sorte à pouvoir tenir compte des autocorrélations succéssives qui sortent de la zone d'acceptation (les lignes discontinuent bleues sur la figure).  
-Par observation de l'ACF (ci-dessous), les trois premières autocorrélations sont très significatives, surtout la troisième, donc un canditat est $q=3$ .
+Pour choisir les paramètres p,d,q qui représentent la modélisation de la partie non saisonnière, on observe l'ACF (autocorrélogramme) et le PACF (autocorrélogramme partiel) à partir du lag 1. L'appréciation de l'ACF permet le choix de q. On choisit q de sorte à pouvoir tenir compte des autocorrélations successives qui sortent de la zone d'acceptation (les lignes discontinuent bleues sur la figure).  
+Par observation de l'ACF (ci-dessous), les trois premières autocorrélations sont très significatives, surtout la troisième, donc un candidat est $q=3$ .
 
 ```{r}
 ggAcf(diff(diff(gazolets,12),12))
 ```
 
 Quant à p, il est choisi sur le même principe que le q mais appliqué au PACF. On observe les premières autocorrélations partielles, c'est à dire à partir de 1, et on prend le coefficient qui tient compte des piques qui sont hors de la zone d'acceptation (autocorrélation partielle est nulle pour le lag correspondant) .
-Des quandidats possibles à p sont $p=3$ , $p=5$ .
+Des candidats possibles à p sont $p=3$ , $p=5$ .
 
 ```{r}
 ggPacf(diff(diff(gazolets,12),12))
 ```
 
-Le paramètre d représente le dégré de différentiation de la partie non saisonnière, vu que la série n'a été différentiée deux fois au lag 12, c'est à dire que sur la période, on suppose que la partie non saisonnière n'a pas été différentiée
+Le paramètre d représente le degré de différenciation de la partie non saisonnière, vu que la série n'a été différentiée deux fois au lag 12, c'est à dire que sur la période, on suppose que la partie non saisonnière n'a pas été différenciée
 
 ### Choix des paramètres P,D,Q
 
-Les paramètres P,Q se choisissent sur les mêmes critères que p,d,q mais appliqués à la partie saisonnière. Pour le choix de ces paramètres, on observe l'ACF et le PACF mais à partir du lag de la période, c'est à dire 12. Donc les parmètres seront choisi afin de tenir compte des piques significatifs à partir du lag 12, contrairement à la partie non saisonnière qui commence au lag 1. Donc $d=0$ .
-Le paramètre D représente le dégré de différentiation de la partie saisonnière c'est à dire $D=2$.
+Les paramètres P,Q se choisissent sur les mêmes critères que p,d,q mais appliqués à la partie saisonnière. Pour le choix de ces paramètres, on observe l'ACF et le PACF mais à partir du lag de la période, c'est à dire 12. Donc les paramètres seront choisis afin de tenir compte des piques significatifs à partir du lag 12, contrairement à la partie non saisonnière qui commence au lag 1. Donc $d=0$ .
+Le paramètre D représente le degré de différenciation de la partie saisonnière c'est à dire $D=2$.
 
 ### Conclusion
 
