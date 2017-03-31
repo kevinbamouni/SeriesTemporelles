@@ -1,7 +1,12 @@
 ---
-title: "SERIES TEMPORELLES"
+title: "Mémoire de séries temporelles"
+author: "Hasnae BEN LAMKADEM & Kevin BAMOUNI"
+date: "31 mars 2017"
 output:
-  pdf_document: default
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
   html_document: default
 ---
 
@@ -15,8 +20,6 @@ output:
 # 17 Vente de gazole en kt ---> gazole
 library(astsa)
 library(ggplot2)
-library(zoo)
-library(plotly)
 library(tseries)
 library(forecast)
 
@@ -25,14 +28,8 @@ dates = seq(as.Date("1981/1/1"), as.Date("2016/11/1"),by = "month")
 
 gazole = c(824.1,677.5,814.2000000000001,822,823,846.1,921.1,617,808.8,881.5,843.6,914.3,673.9,756.2000000000001,891.1,888.7000000000001,800.9,915.6,882.6,704.9,858.2000000000001,898.3,829.7000000000001,870.7000000000001,736.8,755.8,899.6,883,884.7000000000001,887.9,827.4,761.2000000000001,881.5,890.1,879.1,868.9,842.3,849,897.2000000000001,874.1,898.4,914.9,929.5,801.2000000000001,848.1,1009.7,926.6,847.2000000000001,772.7000000000001,847.1,873.2000000000001,940.5,927.2000000000001,913.6,1019.4,789.7000000000001,934.7000000000001,1057.8,947,882.9,898.4,862.7000000000001,915.2000000000001,1046.4,965.9,1013.4,1070.3,870.1,1027.9,1123,978.7000000000001,1077.8,841.1,902.2000000000001,1105.8,1102.3,1016.7,1137.5,1155.7,947.4,1125.4,1173.6,1128.8,1166.8,1024.7,1103,1264.8,1166.2,1190.2,1256,1213.3,1111,1260.2,1243.2,1285.2,1290.6,1217.6,1204.1,1407.5,1273.3,1312.3,1417.4,1339.5,1233.9,1383.3,1459.6,1418.4,1325.4,1406,1269.1,1530.7,1444.7,1472.3,1486.7,1542.1,1415.7,1392.9,1604.5,1511.4,1385.2,1557.4,1304.5,1516.2,1593.9,1574.2,1549.8,1718.4,1440.6,1568,1750.8,1575,1580.5,1573.3,1527.3,1680.8,1715.8,1565.2,1688.2,1754.7,1480.1,1712.5,1769.6,1649.6,1706.9,1536.3,1580,1797.4,1783.5,1630.4,1871.1,1847.7,1705.8,1681.9,1770.9,1730.7,1775.8,1619.9,1602.7,1888.4,1786.4,1819.2,1904.5,1863,1751.7,1895.7,1878.5,1831.3,1893.7,1782.4,1718.6,2031.7,1829.7,1934.6,2012.9,1955.3,1806.5,1932.9,2006.1,1927.7,1930.7,1861.9,1790.7,1947.5,2020.6,1971.8,1949.2,2152.4,1854.3,1960.1,2175.7,1868.5,1936.6,1872.6,1850.6,1965.3,2200.1,2009.5,2082.3,2241.4,1895.7,2144.5,2466.7,1727.6,2109.6,1979.9,1931.4,2165.9,2183.9,2071.9,2211,2334.5,1978.6,2199.3,2273.8,2134.5,2202.6,1946.4,1990,2320.4,2250.5,2133.4,2325.7,2378.1,2118.7,2275.7,2337.7,2247.6,2342.9,2109.6,2149,2391.2,2192.8,2393.2,2346.7,2359.3,2238.4,2169.6,2429.3,2277.7,2298.7,2258.6,2147.5,2414.2,2341.4,2370.1,2445,2559.7,2362.5,2389.4,2599.5,2474,2321.6,2321,2247.5,2505.5,2541,2488.8,2440,2784.1,2362.4,2472.3,2719.5,2491.7,2296.7,2374.9,2298.4,2476.8,2560.2,2452.5,2582.1,2770.2,2359,2633.3,2739.7,2328.5,2505.4,2366.4,2337.5,2664.9,2621.1,2413.8,2768.7,2725.9,2464.4,2631.3,2650.6,2498.1,2619.1,2387.2,2342.8,2641.7,2587.8,2655.1,2735.7,2703.2,2582.9,2645.2,2611.9,2570.2,2584.6,2506.5,2391.5,2768.8,2565,2713.2,2793,2776.8,2600.3,2696.9,2788.6,2658.8,2632.9,2584.1,2441.8,2852.8,2667.4,2700.7,2873.2,2976.6,2742.9,2665.3,3007.5,2780,2615.8,2668.4,2656.3,2705.5,2853.1,2761,2696.8,2990.8,2505.1,2808.7,2975.2,2469,2734,2503.9,2489,2734.1,2809.5,2607.1,2848.6,3048.4,2561.3,2845.7,2889.1,2668.8,2875.7,2368.8,2621.8,2837.3,2894.3,2719.6,2932.7,3049.1,2747.2,2921.1,2943.1,2702.7,2850.5,2639.8,2659.2,2958.6,2830.7,2904.8,2895.2,2894.9,2860.9,2920.8,2889.8,2758.4,2835.6,2707.8,2646.3,2885.2,2814.1,2790.2,2951.9,3054.4,2824.1,2775.2,3078,2899.9,2692.5,2644.4,2576.8,2824,2936.2,2845.8,2797.6,3222.7,2796.2,2842.9,3103.9,2711.1,2862.5,2716.9,2592.5,2818,2931.5,2788.9,2914.2,3146.1,2693.3,2986.6,3111.8,2623.3,3083.6,2647.057,2592.63,2920.537,2985.217,2684.621,3083.758,3252.575,2739.026,2980.078,3032.794,2753.428,3131.497,2521.6,2721.9,2990.8,2889.8,3162.8,2788.9,2969.3,2926.4,2981.8,2929.4,2841.537696)
 
-
-# Donnees de super dans un objet zoo, qui est un objet  de format serie temporelle
-gazolezoo = zoo(gazole,as.yearmon(dates))
-
-
 gazolets = ts(gazole,frequency =12, start = c(1981,1),end =c(2016,11))
-# intitulÃ© des donnÃ©es
-names(gazole)="Ventes de gazole (en kt)"
+
 ```
 
 # Données : Ventes de gazole (en kt)
@@ -40,7 +37,7 @@ names(gazole)="Ventes de gazole (en kt)"
 La série chronologique étudiée représente les ventes mensuelles de gazole (en Kt) du 01 janvier 1981 au 01 novembre 2016. 
 
 ```{r}
-plot.ts(gazolets, main="Ventes de gazole en kt")
+autoplot(gazolets, main="Ventes de gazole en kt")
 ```
 
 La figure ci-dessus représente la série. Les premières observations que nous pouvons faire à partir de cette série sont les suivantes :
@@ -57,9 +54,7 @@ Certaines remarques ont été faite à la première observation de la série, ce
 Nous passons au log des données afin de pouvoir réduire les variations d'amplitude dans le temps.
 
 ```{r}
-plot.ts(log(gazolets), main="log des Ventes de gazole en kt")
-
-# loggazolets = log(gazolets) # pour supprimmer la diffÃ©rence d'amplitude
+autoplot(log(gazolets), main="log des Ventes de gazole en kt")
 ```
 
 En observant le log de la série, la variation d'amplitude n'ont pas totalement disparu, de plus la tendance présente désormais une certaine courbure. En passant au log, le problème d'amplitude n'a pas été résolu de façon satisfaisante, pour la tendance, plus elle est linéaire, mieux nous pouvons l'observer de façon globale.
@@ -111,9 +106,9 @@ En résumé, les caractéristiques de la série sont les suivantes :
 - tendance croissante
 - périodique de période 12
 
-# Modélisation de la série
+# Modélisation puis calibration, de la série ventes de gazole
 
-La section précédente nous a permis de conclure sur une série non-stationnaire, saisonnière de saisonnalité 12. Le choix logique de ce modèle pour l'estimation de la série est un modèle Seasonnal ARIMA (p,d,q)(P,D,Q) (SARIMA). Les coefficients de ce modèles sont eux aussi fournis par les caractéristiques de la série. Le choix de ces coefficients représentent la principale difficulté, cependant nous pouvons observer différentes transformations de la série afin d'orienter nos différents choix. Tout d'abord explicitons les différentes significations de ces coefficients :
+La section précédente nous a permis de conclure sur une série non-stationnaire, saisonnière de saisonnalité 12. La modélisation consiste à trouver le modèle de série chronologique qui saura reproduire au mieux la série. Le choix logique de ce modèle pour l'estimation de la série est un modèle Seasonnal ARIMA (p,d,q)(P,D,Q) (SARIMA). Les coefficients de ce modèles sont eux aussi fournis par les caractéristiques de la série. Le choix de ces coefficients représentent la principale difficulté, cependant nous pouvons observer différentes transformations de la série afin d'orienter nos différents choix. Tout d'abord explicitons les différentes significations de ces coefficients :
 
 - p : AR de la partie non saisonnière de la série
 - d : Degré d'intégration de la partie non saisonnière de la série
@@ -121,6 +116,9 @@ La section précédente nous a permis de conclure sur une série non-stationnair
 - P : AR de la partie saisonnière de la série
 - D : Degré d'intégration de la partie saisonnière de la série
 - Q : MA de la partie saisonnière de la série
+
+Le bon modèle, sera celui dont les coefficients permettent d'obtenir un bruit banc comme résidus. Les résidus doivent suivre une loi normale de moyenne nulle, de variance constante et sans autocorrélation.
+L'objectif de la modéliser  la série est de pouvoir prédire un certain nombre de valeurs futures avec un minimum de marge d'érreur.
 
 ## Stationnarisation de la série
 
@@ -130,7 +128,7 @@ $$d^2X = dX_t-dX_{t-12}\  \ avec\  \ dX = X_t-X_{t-12}$$
 
 
 ```{r}
-tsdisplay(diff(diff(gazolets,12),12))
+tsdisplay(diff(diff(gazolets,12),12), main = "la série vente de gazole différentiée")
 ```
 
 L'autocorrelograme de la série décroît de façon exponnentielle, avec un pique au lag 12 qui représente la saisonnalité aussi observé dans l'autocorrelogramme partiel.
@@ -154,14 +152,14 @@ Pour choisir les paramètres p,d,q qui représentent la modélisation de la part
 Par observation de l'ACF (ci-dessous), les trois premières autocorrélations sont très significatives, surtout la troisième, donc un candidat est $q=3$ .
 
 ```{r}
-ggAcf(diff(diff(gazolets,12),12))
+ggAcf(diff(diff(gazolets,12),12), main = "Autocorrélogramme de la série vente de gazole différentiée")
 ```
 
 Quant à p, il est choisi sur le même principe que le q mais appliqué au PACF. On observe les premières autocorrélations partielles, c'est à dire à partir de 1, et on prend le coefficient qui tient compte des piques qui sont hors de la zone d'acceptation (autocorrélation partielle est nulle pour le lag correspondant) .
 Des candidats possibles à p sont $p=3$ , $p=5$ .
 
 ```{r}
-ggPacf(diff(diff(gazolets,12),12))
+ggPacf(diff(diff(gazolets,12),12),main="Autocorrélogramme partiel de la série vente de gazole différentiée")
 ```
 
 Le paramètre d représente le degré de différenciation de la partie non saisonnière, vu que la série n'a été différentiée deux fois au lag 12, c'est à dire que sur la période, on suppose que la partie non saisonnière n'a pas été différenciée
@@ -175,9 +173,9 @@ Le paramètre D représente le degré de différenciation de la partie saisonni�
 
 Les modèles candidats sont donc $SARIMA(3,0,3)(2,2,3)_{12}$ et $SARIMA(5,0,3)(2,2,3)_{12}$ .
 
-## Modélisation de la série
+## Calibration des modèles à la série
 
-la modésation de la série consiste à appliquer les remarques faites sur ses caractéristiques, et estimations des coefficients de la série par la méthode de maximum de vraissemblance. 
+La calibration consiste à estimer les coefficients du modèle choisi à partir de la série.
 
 ### SARIMA(3,0,3)(2,2,3)  
 
@@ -192,6 +190,8 @@ L'exécution de ce modèle sous R renvoie le message, "problème de convergence 
 
 ### SARIMA(5,0,3)(2,2,3) 
 
+#### Test d'autocorrélation de Ljung-Box sur les résidus
+
 Le deuxième modèle appliqué est le modèle : $SARIMA(5,0,3)(2,2,3)_{12}$ .
 
 ```{r}
@@ -201,13 +201,17 @@ tsdiag(out, gof.lag=60)
 
 La figure ci-dessus représente les residus, l'ACF des résidus et le test Ljung-Box static, qui fourni l'hypothèse de non autocorrélation des résidus jusqu'au lag 60.
 
+#### Test de normalité des résidus
 
 ```{r, echo=FALSE}
 qqnorm(out$residuals)
 qqline(out$residuals)
+
 ```
 
 Avec le test de normalité ci dessus, nous pouvons supposer que les résidus suivent une loi normale, doc qu'on a bien un bruit blanc. Mais nous restons conscient que cette hypothèse est très limite et qu'il y'aurait moyen de fair mieux en choisisant un meilleur modèle. Cependant il faudrait éviter les modèles avec un très grand nombre de paramètre à estimer sysnonyme d'erreurs d'estimation. 
+
+#### Résultats de la calibration du modèle
 
 Les sorties du modèle de la série sont donc : 
 
@@ -215,7 +219,7 @@ Les sorties du modèle de la série sont donc :
 out
 ```
 
-# Prédiction
+# Prédiction sur 1 an de Vente de Gazole
 
 A partir du modèle estimé, nous pouvons faire une prédiction sur les 12 mois suivant de la série.
 
@@ -226,6 +230,132 @@ predict(out, n.ahead = 12)
 pred : la prédiction, se : l'erreur d'estimation.
 
 ```{r}
-plot(predict(out, n.ahead = 12))
+autoplot(forecast(out,h=12))
 ```
 
+Le graphique ci dessus représente la série de vente de gazole (en kt) ainsi que la prédiction sur les 12 mois suivants.
+
+# Données : Ventes de super carburant (en kt)
+
+La série chronologique étudiée représente les Ventes mensuelles de super carburant (en Kt) du 01 janvier 1981 au 01 novembre 2016. L'étude de cette série a les même étapes que la série précédente, nous allons observer puis en tirer des conclusions sur les caractéristiques de la série.
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# les dates d'indexation des series temporelles, donnÃ©es mensuelles
+dates = seq(as.Date("1981/1/1"), as.Date("2016/11/1"),by = "month")
+
+super = c(1418.9,1159.4,1379.8,1625.2,1427,1588.3,1881.7,1598.4,1560.9,1514.7,1392.6,1568.4,1184.4,1254.9,1493.4,1639.4,1432.1,1640.4,1794.2,1708.4,1576.3,1528.4,1387.3,1492.4,1285.2,1260.3,1518.9,1543.5,1569,1606.9,1705.4,1763.5,1589.4,1473.5,1448.5,1477,1378.3,1379.8,1474.9,1564.4,1535.9,1626.2,1722.9,1742.8,1462.7,1565.4,1432.8,1438.6,1289,1300,1389.7,1543.5,1556.3,1486.7,1763.4,1697.8,1516.9,1577.7,1395.3,1490.1,1391.2,1267,1424.1,1564.5,1607.7,1546.8,1795,1706,1581.8,1600.4,1395.9,1603.5,1300.2,1282.8,1480.5,1619.2,1499.9,1651.7,1814.6,1683.4,1584.5,1546.7,1475.7,1597.5,1360.6,1404,1556.4,1579.7,1617.3,1595.9,1763.2,1769.8,1602.1,1525.9,1504.4,1544.2,1402.2,1339.9,1614.1,1459.5,1598.6,1606.7,1658.6,1732.2,1561.8,1561.7,1458.6,1496.3,1459,1284.5,1540.3,1561.1,1600.6,1588.4,1710.3,1734.9,1410.2,1524.6,1421.2,1395.6,1400.8,1183,1411.3,1503,1566.2,1468.6,1750.6,1715.7,1496.1,1554.3,1377.5,1448.9,1365.3,1270.5,1409.6,1539.2,1436.8,1517.1,1687.4,1601.2,1503.2,1468.5,1323.9,1473.9,1265.4,1235.6,1411.7,1495.6,1395.9,1537,1639.3,1572.8,1438.7,1395.7,1309.9,1371,1232.3,1185,1380.3,1385,1425.7,1425,1555.7,1561.7,1404.4,1339.5,1253.9,1340.1,1200.7,1108.7,1317.9,1295.4,1363,1383.3,1465.2,1434.1,1292.1,1293.9,1201,1295.2,1175.7,1084.8,1205.3,1307.1,1309.4,1248.8,1437.1,1404.4,1228.4,1295,1131.8,1170,1097.9,1044.7,1156.2,1297.7,1256.9,1235,1416.1,1349.4,1257.3,1352,975.1,1194.9,1104,1031.5,1156,1247.7,1240,1248.7,1413,1327.1,1231.7,1221.9,1119.3,1209,1035.8,1014.6,1202.9,1246.5,1240.9,1275.7,1401.1,1339,1214.2,1174.3,1111.9,1198.7,1055.1,1036.8,1163.2,1145.6,1225.7,1222.6,1266,1294,1084.1,1139.2,1042.3,1106.6,1040.9,977.7000000000001,1101.1,1133.4,1159.4,1179.1,1263.9,1292.5,1112,1170.2,1073.2,1066.2,1001.4,943.4,1101.3,1120.1,1148.5,1097.6,1275.6,1222.5,1078.2,1130.5,1019.9,959.4,947.6,883.9,997,1058.2,1050.1,1100.8,1176.3,1114,1044.6,1049.4,869.1,980.6,881.6,854.3,964.8,1018.6,963.5,1050,1098.1,1056.5,986.2000000000001,963.2000000000001,884,954,832.2000000000001,786.4,918.1,916.7000000000001,989.5,983.9,1016.6,1029.7,918.1,881.7000000000001,833.7000000000001,863.3,793.2000000000001,741.3,846.3,876.5,910.8,921.5,954.7000000000001,938.9,868.5,862.2000000000001,784.9,828.1,759.1,697.7000000000001,833.6,840.5,844.5,868.4,922.8,922.7000000000001,798.7000000000001,847.3,757,749.3,711.3,700.1,727.7000000000001,772.3,823.9,755.5,869,794.3,773.9,781.5,635,747,655.4,618.8,702.7000000000001,784.6,742,782.5,863,764,744,725,645,729,555,609,659,739,694,738.2000000000001,801.9,744.1,709.6,668.5,641.5,654.8,581,578.4,654,688.5,682.4,680.7000000000001,698.1,726.2000000000001,667.8,643.7000000000001,590.2000000000001,613.1,558,531.8,594.5,604.7000000000001,635.7000000000001,658.6,693.8,684.5,588.2000000000001,622.2000000000001,582.6,543.1,515,485.4,549.7000000000001,615.6,625,601,712,660.8,589.8,617.3,519.7000000000001,581.1,519.8,485.9,555.2000000000001,624.2000000000001,595.6,626.6,678.5,625.1,621.7000000000001,617.3,506.3,619.2000000000001,505.622,479.662,562.963,638.007,589.28,650.784,717.122,622.549,619.3440000000001,605.533,538.878,650.211,488.8,523,601.7000000000001,602.5,680.6,625.8,687.4,700.9,637,605,573.366192)
+
+
+superts = ts(super,frequency =12, start = c(1981,1),end =c(2016,11))
+```
+
+
+La série se présente comme suit : 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+autoplot(superts,main="Ventes de super carburant (en kt)")
+```
+
+# Caractéristiques de la série supercarburant
+
+En premier lieu nous avon besoin de savoir si la série est stationnaire ou non. Par observation nous voyons bien qu'elle ne l'est pas et nous pouvons le confirmer par le tes de Dickey-Fuller augmenté. 
+
+```{r}
+adf.test(superts)
+```
+
+La p-value est sensiblement de 5%, la série n'est donc pas stationnaire par hypothèse.
+
+Nous pouvons aussi observer l'autocorrelogramme (ACF) de la série.
+
+```{r}
+ggAcf(superts, main="autocorrelogramme Ventes de super carburant (en kt)")
+```
+
+l'ACF décroit très lentemment vers 0 avec des piques périodiques de période 12.
+La série n'est donc pas stationnaire, mais elle a une saisonnalité de 12.
+
+Nous supposons que la série est additive, ce qui nous donne la décomposition suivante :
+
+```{r}
+autoplot(decompose(superts, type = "additive"))
+```
+
+On observe une tendance décroisante et la saisonnalité.
+
+En résumé, les caractéristiques de la série sont les suivantes :
+
+- Non stationnaire
+- additive
+- tendance décroissante
+- périodique de période 12
+
+# Modélisation de la série de vente de super carburant.
+
+Comme pour la série de vente de gazole, un certain nombre de transformation dans un objectif de trouver le modèle de la série s'impose.
+
+## Stationnarisation de la série de vente de super carburant.
+
+Commençons pas stationnariser la série. Nous la stationnarisons par la méthode des différentions sur la partie non saisonnière, c'est à dire de lag 1. Ainsi nous conservons la saisonnalité de la série.
+
+```{r}
+autoplot(diff(superts), main="La série vente de Super carburant différentiée")
+```
+
+le test de Dickey-Fuller augmenté confirme bien une série stationnaire, vaec une pvalue inférieur à 5%.
+
+```{r}
+adf.test(diff(superts))
+```
+
+## Choix des paramètres p,d,q et P,D,Q
+
+Comme pour la série de ventes de gazole, la série "vente de super carburant", est non stationnaire et saisonnière, nous pouvons donc la modéliser par un modèle SARIMA.
+
+L'estimation des paramètre sera fondé sur l'observation des autocorrélogramme et autocorrélogramme partiel.
+
+```{r}
+ggAcf(diff(superts), main="Autocorrélogramme de la série vente de Super carburant différentiée")
+```
+
+```{r}
+ggPacf(diff(superts), main="Autocorrélogramme partiel de la série vente de Super carburant différentiée")
+```
+
+### Choix des paramètres p,d,q
+
+Le choix de ces paramètres sera la résultante des autocorrélations et des autocorrélations partielles à partir de la partie non saisonnière c'est àà dire à partir du lag 1. p, représentera le nombre d'autoccorélations partielles significatifs à modéliser, q, le nombre d'autoccrélation significatif et d le degré de différentiation.
+
+### Choix des paramètres P,D,Q
+
+Le choix de ces paramètres sera la résultante de l'observation de la partie saisonnière de l'ACF et du PACF. avec D le degré de différentiation de la partie saisonnière.
+
+
+## Calibration des modèles à la série
+
+Le meilleur modèle que nous ayons trouvé est le modèle SARIMA(3,1,2)(5,0,2).
+
+```{r}
+out2<-arima(superts,order=c(3,1,2),seasonal=list(order=c(5,0,2)), method = "ML")
+tsdiag(out2, gof.lag=60)
+```
+
+
+```{r, echo=FALSE}
+qqnorm(out2$residuals)
+qqline(out2$residuals)
+
+```
+
+# Prédiction sur 1 an de Vente de super carburant
+
+Les valeurs de prédiction sur 1 an sont : 
+
+```{r}
+predict(out2, n.ahead = 12)
+```
+
+pred : la prédiction, se : l'erreur d'estimation.
+
+```{r}
+autoplot(forecast(out2,h=12))
