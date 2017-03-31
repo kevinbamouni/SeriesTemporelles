@@ -5,6 +5,8 @@ output:
   html_document: default
 ---
 
+# Introduction
+
 
 
 ```{r import_format_data, include=FALSE}
@@ -33,152 +35,125 @@ gazolets = ts(gazole,frequency =12, start = c(1981,1),end =c(2016,11))
 names(gazole)="Ventes de gazole (en kt)"
 ```
 
-# Introduction et hypothÃ¨ses
+# Données : Ventes de gazole (en kt)
 
-On suppose que les processus sont additifs
-
-# Visualisation des donnÃ©es des sÃ©ries temporelles
-
-## Ventes de gazole (en kt)
+La série chronologique étudiée représente les ventes mensuelles de gazole (en kt) du 01 janvier 1981 au 01 novembre 2016. 
 
 ```{r}
-plot.ts(gazolets, main="Vente de gazoil")
-
-plot.ts(log(gazolets), main="log des Ventes de gazoil")
-
-loggazolets = log(gazolets) # pour supprimmer la diffÃ©rence d'amplitude
+plot.ts(gazolets, main="Ventes de gazole en kt")
 ```
 
+La figure ci-dessus représente la série. Les premières observations que nous pouvons faire à partir de cette série sont les suivantes :
+- La série a une tendance croissante.
+- La série a une périodicité, du fait de sa succession de croissance et de décroissante au fil du temps.
+- La série est multiplicative, du fait que l'amplitude de sa période augmente avec le temps.
+- On peut utiliser le log de la série pour supprimmer cette variation d'amplitude dans la série.
+- La série n'est pas stationnaire, la variance n'est pas constante dans le temps.
 
-# Test de stationnaritÃ© :  
+# Caractéristiques de la série.
 
-## Gazole : le test de Dickey-Fuller augmentÃ©
+Certaines remarques ont été faite à la première observation de la série, cependant il conviendrait de vérifier ces appréhension et de poser certaines hypothèses si nécéssaire de sorte à pouvoir cerner toutes les caractéristiques de la série.
+
+Nous passons au log des données afin de pouvoir réduire les variations d'amplitude dans le temps.
+
+```{r}
+plot.ts(log(gazolets), main="log des Ventes de gazole en kt")
+
+# loggazolets = log(gazolets) # pour supprimmer la diffÃ©rence d'amplitude
+```
+
+En observant le log de la série, la variation d'amplitude n'ont pas totalement disparu, de plus la tendance présente désormais une certaine courbure. En passans au log, le problème d'amplitude n'a pas été résolu de façon satisfaisante, pour la tendance, plus elle est linéaire, mieux nous pouvons l'observer de façon globale.
+
+## Test de stationnarité de la série.  
+
+### Augmented Dickey-Fuller Test
  
+ Le tes de Dickey-Fuller, effectue un test de stationnarité de la série avec pour hypothèse nulle, la série n'est pas stationnaire avec un seuil d'erreur de 5%.
  
 ```{r}
-# Augmented Dickey-Fuller Test du package "tseries"
-
-# adf.test(diff(log(gazolezoo)), alternative="stationary", k=0)
-adf.test(gazolezoo)
+adf.test(gazolets)
 
 ```
 
-On ne rejette pas l'hypothÃ¨se nulle, elle est non stationnaire
+On ne rejette pas l'hypothèse nulle la p-value étant supérieur au seuil de 5%, la série est donc non stationnaire.
 
-## Phillips-Perron Unit Root Test
+Cette hypothèse peut etre confirmée par l'observation de l'autocorrelogramme de la série.
+
 
 ```{r}
-pp.test(gazolezoo)
+ggAcf(gazolets, main="Vente de gazole en kt")
 ```
 
-On ne rejette pas l'hypothÃ¨se nulle, elle est non stationnaire
-
-## Phillips-Perron Unit Root Test
-
+L'autocorrellogramme ne décroit pas de façon exponentielle vers 0, par contre on observe des grands piques aux lags 1, 12, 24. ce qui pourrait représenter la périodicité de la série.
+La période la série peut être confirmée par la fonction frequency de R.
 ```{r}
-pp.test(gazolezoo)
-```
-La serie ne possÃ¨de pas de racine unitaire unique.
-
-## Gazole : le test KPSS
-
-```{r}
-# Test KPSS de stationnaritÃ© du package spss
-
-kpss.test(gazolezoo)
-
-```
-
-# Autocorrelogrammes et autocorrelogrammes partielles : Confirmation de non-stationnaritÃ©e
-
-## Vente de gazole en kt / Autocorrelogramme / Autocorrelogramme partiel
-
-```{r}
-acf(gazolezoo)
-pacf(gazolezoo)
-```
-
-# Stationnarisation de la sÃ©rie
-
-L'Ã©limination du trend donne une meilleure dÃ©composition que l'Ã©limination du trend et la saisonnalitÃ©.
-
-```{r}
-# Elimination de la tendance et de la saisonalitÃ©
-# La saisonnalitÃ© 
 frequency(gazolets)
-
-# Suppression de la tendance et de la saisonnalitÃ©
-gazoletsdiff = diff(gazolets, lag = 12)
-
-plot(gazoletsdiff, main="serie diffÃ©renciÃ©e")
-
-acf(gazoletsdiff)
-pacf(gazoletsdiff)
 ```
 
-# DÃ©composition additive de la sÃ©rie 
+## Décomposition de la série :
+
+Nous avons observé à première vue que la série est multiplicative, du fait de l'augmentation de l'amplitude de sa périodicité dans le temps, et de la forme horizontale de tendance à partir d'un certain temps.Observons sa décomposition multiplicative et comparons la avec sa décomposition additive dans la figure ce dissous.
 
 ```{r}
- gazoletsdiff_decadd = decompose(gazoletsdiff, type = "additive")
- 
- plot(gazoletsdiff_decadd)
+par(mfrow=c(1,2))
+autoplot(decompose(gazolets, type = "multiplicative"))
+autoplot(decompose(gazolets, type = "additive"))
 ```
 
-# DÃ©composition multiplicative de la sÃ©rie 
+La décomposition en multiplicative et additive ne varie que sur les résidus, le trend et la saisonnalité restent plus ou moins identiques pour les deux méthodes de décomposition. Dans la suite nous pouvons donc supposer que la série est additive.
 
-```{r}
- gazoletsdiff_decmult = decompose(gazoletsdiff, type = "multiplicative")
- 
- plot(gazoletsdiff_decmult)
-```
+## Conlusion 
 
-# ARIMA
+En résumé, les caractéristiques de la série sont les suivantes :
+
+- Non stationnaire
+- additive
+- tendance croisante
+- périodique de période 12
+
+# Modélisation de la série
+
+La section précédente nous a permis de conclure sur une série non-stationnaire, saisonnière de saisonnalité 12. Le choix logique de modèle pour l'estimation de la série est un modèle Seasonnal ARIMA (p,d,q)(P,D,Q) (SARIMA). Les coefficients de ce modèles sont eux aussi fournis par les caractéristiques de la série. Le choix de ces coefficients représentent la principale difficulté, cependant nous pouvons observer différentes transformations de la série afin d'orienter nos différents choix. Tout d'abord explicitons les différentes significations de ces coefficients :
+
+- p : AR de la partie non saisonnière de la série
+- d : Degré d'intégration de la partie non saisonnière de la série
+- q : MA de la partie non saisonnière de la série
+- P : AR de la partie saisonnière de la série
+- D : Degré d'intégration de la partie saisonnière de la série
+- Q : MA de la partie saisonnière de la série
+
+## Stationnarisation de la série
+
+La première étape essentielle est la stationnarisation de la série. IL existe plusieurs manières de le faire, mais le plus important est de choisir une série stationnaire qui permettrait de choisir les bons coefficients. Nous choisissons une stationnarisation par différentiation de degré 2 au lag 12, pour supprimer la tendance et la saisonnalité.
 
 ```{r}
 tsdisplay(diff(diff(gazolets,12),12))
 ```
 
+L'autocorrelograme de la série décroit de façon exponnentielle, avec un pique au lag 12 qui représente la saisonnalité aussi observé dans l'autocorrelogramme partiel.
+
+
 ```{r}
 
+adf.test(diff(diff(gazolets,12),12))
+
+```
+```
+Avec la confirmation du test de Dickey-Fuller augmenté (p-value inférieure à 5%) on obtient une série stationnaire.
+
+## Choix des paramètres p,d,q et P,D,Q
+
+Le choix des paramètres (p,d,q)(P,D,Q), se font essentiellement sur la base de l'autocorrelogramme et de l'autocorrelogramme partiel. 
+
+```{r}
+ggAcf(diff(diff(gazolets,12),12))
+ggPacf(diff(diff(gazolets,12),12))
+```
+
+
+```{r}
 out<-arima(gazolets,order=c(5,0,3),seasonal=list(order=c(2,2,5)), method = "ML")
 tsdiag(out, gof.lag=60)
 ```
 
-# modÃ©lisation directe de la sÃ©rie...sans Ã©limination ni de tendance ni de saisonnalitÃ©
 
-```{r}
-out2<-arima(gazolets,order=c(4,2,4),seasonal=list(order=c(4,2,4),period=12), method = "ML")
-tsdiag(out2, gof.lag=60)
-
-```
-
-# Tendance Ã©liminÃ©e
-
-```{r}
-gazoletsdiff1 = diff(gazolets)
-
-plot(gazoletsdiff1)
-
-```
-
-# ACF ET PACF sÃ©rie sans trend
-
-```{r}
-acf(gazoletsdiff1)
-
-pacf(gazoletsdiff1)
-```
-
-# modÃ©lisation arima avec saisonnalitÃ©...
-
-```{r}
-out3<-arima(gazolets,order=c(4,2,4),seasonal=list(order=c(4,2,4),period=NA),method="ML")
-#out3 = sarima(gazolets, 4, 2, 4, P = 4, D = 2, Q = 4, S = 12)
-tsdiag(out3, gof.lag=60)
-```
-
-```{r}
-out4<-arima(gazolets,order=c(4,1,8),seasonal=list(order=c(4,1,8),period=NA),method="ML")
-#out3 = sarima(gazolets, 4, 2, 4, P = 4, D = 2, Q = 4, S = 12)
-tsdiag(out4, gof.lag=60)
-```
