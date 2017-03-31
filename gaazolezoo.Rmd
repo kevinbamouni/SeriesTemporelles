@@ -395,7 +395,15 @@ pred : la prédiction, se : l'erreur d'estimation.
 autoplot(forecast(out2,h=12))
 ```
 
-
+De façon générale on peut conclure que la prédiction ne trahi pas la structure de la série. 
 
 # Conclusion
+
+Dans notre projet, nous avons étudié deux séries. Cette étude avait pour but de modéliser, calibrer et prédire les séries. la modélisation a consisté à trouver des modèles qui vont les estimer avec le moins d'erreur possible. 
+Pour les deux séries, le modèle SARIMA a été utilisé, du fait de la saisonnalité très présente des deux séries. Quant aux coefficients d'autorégression et de moyenne mobile, ils ont été choisis de façon sélective à partir de l'observation et de l'appréciation des autocorrélogramme et autocorrélogramme partiel. Nous avons testé un certain nombre de modèle, puis retenu ceux qui fournissaient des résidus sans autocorrélation (test de ljung-box) et de loi normale (test de normalité).
+Ensuite nous avons calibré les modèles choisis par la méthode de vraisemblance, c'est à dire que nous avons estimé les paramètres du modèle SARIMA.
+Après modélisation et calibration nous avons prédit les 12 prochaines valeurs des séries.
+Dans l'ensemble la prédiction ne trahi pas les structure des séries. Cependant nous somme conscient que les nodèles ne sont pas uniques, et qu'il est possible d'en trouver d'autres avec des meilleures performances d'estimation. Ces modèles peuvent êtres trouver en différenciant de différente façon les séries.
+Pour les deux séries, nous avions bien des résidus sans autocorrélation, mais pas forcément de loi normale et de moyenne nulle, à cause notemment des valeurs assez extrèmes présentes dans les résidus. Donc nous avons supposé que les résidus sont des bruits blancs et nous avons effectué les prédictions. Toute la difficulté des séries temporelles se trouvent dans la modélisation, et avec une étude plus approfondi et avec des moyens techniques et théoriques avancé, il est possible de "trouver" le meilleur modèle pour chacune des séries.
+
 
