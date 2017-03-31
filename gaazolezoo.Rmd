@@ -12,6 +12,13 @@ output:
 
 # Introduction
 
+Aujourd’hui la plupart des entreprises et plus précisément les entreprises spécialisées dans l’informatique décisionnelle, font des séries temporelles afin d’étudier les variables au cours du temps.
+
+L'étude des séries temporelles a pour objectif de déterminer le trend et la saisonnalité au cours du temps  et de savoir si le processus est linéaire ainsi d’estimer les modèles ARMA et ARIMA et faire des previsions à la fin.
+
+ces séries ont une structure fondée sur les bases de données, fournissant ainsi le volume nécessaire d’information permettant de dresser une série chronique historique des événements passés dans le but de prévoir le futur.
+
+Après avoir défini les séries temporelles, notre projet va consister à étudier, modéliser et prédire deux séries temporelles différentes sur une même période.
 
 
 ```{r import_format_data, message=FALSE, warning=FALSE, include=FALSE}
@@ -72,7 +79,9 @@ adf.test(gazolets)
 
 On ne rejette pas l'hypothèse nulle la p-value étant supérieur au seuil de 5%, la série est donc non stationnaire.
 
-Cette hypothèse peut être confirmée par l'observation de l'autocorrelogramme de la série.
+### Hypothèse de stationnarité par l'autocorrélogramme (ACF)
+
+Cette hypothèse peut être confirmée ou infirmée par l'observation de l'autocorrelogramme de la série. En effet une série stationnaire à un autocorrélogramme qui décroit de façon exponentielle vers 0.
 
 
 ```{r}
@@ -181,8 +190,15 @@ La calibration consiste à estimer les coefficients du modèle choisi à partir 
 
 Le premier modèle appliqué est le modèle : $SARIMA(3,0,3)(2,2,3)_{12}$ .
 
-```{r}
+Les résultats de calibration sont : 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 out<-arima(gazolets,order=c(3,0,3),seasonal=list(order=c(2,2,5)), method = "ML")
+out
+```
+
+
+```{r}
 tsdiag(out, gof.lag=60)
 ```
 
@@ -190,12 +206,21 @@ L'exécution de ce modèle sous R renvoie le message, "problème de convergence 
 
 ### SARIMA(5,0,3)(2,2,3) 
 
-#### Test d'autocorrélation de Ljung-Box sur les résidus
-
 Le deuxième modèle appliqué est le modèle : $SARIMA(5,0,3)(2,2,3)_{12}$ .
 
-```{r}
+Les résultats de calibration sont : 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 out<-(arima(gazolets,order=c(5,0,3),seasonal=list(order=c(2,2,5)), method = "ML"))
+out
+```
+
+#### Test d'autocorrélation de Ljung-Box sur les résidus
+
+
+Le test d'autocorrélation de Ljung-Box sur les résidus fourni les résultats suivants: 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 tsdiag(out, gof.lag=60)
 ```
 
@@ -210,14 +235,6 @@ qqline(out$residuals)
 ```
 
 Avec le test de normalité ci dessus, nous pouvons supposer que les résidus suivent une loi normale, doc qu'on a bien un bruit blanc. Mais nous restons conscient que cette hypothèse est très limite et qu'il y'aurait moyen de fair mieux en choisisant un meilleur modèle. Cependant il faudrait éviter les modèles avec un très grand nombre de paramètre à estimer sysnonyme d'erreurs d'estimation. 
-
-#### Résultats de la calibration du modèle
-
-Les sorties du modèle de la série sont donc : 
-
-```{r, echo=FALSE}
-out
-```
 
 # Prédiction sur 1 an de Vente de Gazole
 
@@ -335,17 +352,34 @@ Le choix de ces paramètres sera la résultante de l'observation de la partie sa
 
 Le meilleur modèle que nous ayons trouvé est le modèle SARIMA(3,1,2)(5,0,2).
 
-```{r}
+Les résultats de calibration sont :
+
+```{r, echo=FALSE}
 out2<-arima(superts,order=c(3,1,2),seasonal=list(order=c(5,0,2)), method = "ML")
+out2
+```
+
+#### Test d'autocorrélation de Ljung-Box sur les résidus
+
+Le test d'autocorrélation de Ljung-Box sur les résidus fourni les résultats suivants: 
+
+```{r}
 tsdiag(out2, gof.lag=60)
 ```
 
+On observe une indépendance des résidus jusqu'au lag 60, on peut en conclure que les résidus sont non autocorrelés.
+
+#### Test de normalité des résidus
+
+Le test de normalité des résidus fourni les résultats suivants : 
 
 ```{r, echo=FALSE}
 qqnorm(out2$residuals)
 qqline(out2$residuals)
 
 ```
+
+On peut considérer l'hypothèse que les résidus sont de loi normale. Mais en éliminant les valeurs extrèmes des résidus on peut arriver à une loi normale avec plus de certitude.
 
 # Prédiction sur 1 an de Vente de super carburant
 
@@ -359,3 +393,9 @@ pred : la prédiction, se : l'erreur d'estimation.
 
 ```{r}
 autoplot(forecast(out2,h=12))
+```
+
+
+
+# Conclusion
+
